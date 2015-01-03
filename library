@@ -1,0 +1,290 @@
+#! /bin/sh 
+
+# (C) 2014, MIT license, "library", csitd
+
+# A library of shell functions
+
+# A work in progress...
+
+# `exponentation'
+#############
+expon()
+{
+        COUNT="1"
+        HOLD="$1"
+        LENGT="$2"
+        if [ "$LENGT" -eq 0 ]
+        then    printf "1"
+        else    while [ "$COUNT" -lt "$LENGT" ]
+                do	HOLD=$(( HOLD * $1  ))
+                        COUNT=$((COUNT + 1 ))
+                done
+                printf "$HOLD"
+        fi
+}
+
+
+# `hex_to_ip'
+##############
+hex_to_ip(){
+        CACHE="$1"
+        COUNT="0"
+        REMOV=""
+        while [ "$COUNT" -lt 4 ]
+        do
+                REMOV=${CACHE%*??}
+                printf  "%d"  "0x${CACHE##$REMOV}"
+                COUNT=$(( COUNT + 1 ))
+                [ "$COUNT" -eq 4 ] && break
+                printf  "."
+                CACHE="$REMOV"
+        done
+        printf  "\n"
+
+}
+
+
+
+# `hex_to_int'
+##############
+hex_to_int()
+{
+        for i in $@
+        do      printf  "%d\n" "0x${i}"
+        done
+}
+
+# `selection sort'
+############## 
+
+selection_sort()
+{
+C="0"
+N="$#"
+
+for i in $@
+do
+     eval ARRAY_"$C"="$i"
+     C=$(( $C + 1 ))
+done
+
+C="0"
+
+while [ "$C" -lt "$(( $N - 1 ))" ]
+do
+
+     POSIT="$C";
+     D=$(( $C + 1 ))
+     while [ "$D" -lt "$N"  ]
+     do
+           if [ "$( eval printf '$'ARRAY_$POSIT )" -gt \
+                "$( eval printf '$'ARRAY_$D )" ]
+           then POSIT="$D";
+           fi
+           D=$(( $D + 1 ))
+     done
+
+     if [ "$POSIT" != "$C" ]
+     then
+           HOLD="$( eval printf '$'ARRAY_$C )"
+           eval ARRAY_"$C"="$( eval printf '$'ARRAY_$POSIT )"
+           eval ARRAY_$POSIT="$HOLD"
+     fi
+     C=$(( $C + 1 ))
+done
+
+C="0"
+
+while [ "$C" -lt "$N" ]
+do
+     printf "%s\n"  "$( eval printf '$'ARRAY_$C )"
+     C=$(( C + 1 ))
+done
+
+}
+
+
+
+# `insertion sort'
+##############
+insertion_sort()
+{
+C="0"
+N="$#"
+
+for i in $@
+do
+     eval ARRAY_"$C"="$i"
+     C=$(( $C + 1 ))
+done
+
+C="1"
+
+while [ "$C" -lt "$N" ]
+do
+     D="$C"
+     while [ "$D" -gt "0" -a \
+         "$( eval printf '$'ARRAY_$D )" -lt \
+         "$( eval printf '$'ARRAY_$(( $D - 1 )) )" ]
+     do
+          HOLD="$( eval printf '$'ARRAY_$D )"
+          eval ARRAY_"$D"="$( eval printf '$'ARRAY_$(( $D - 1 )) )"
+          eval ARRAY_$(( $D - 1 ))="$HOLD"
+          D=$(( $D - 1 ))
+     done
+     C=$(( $C + 1 ))
+done
+
+C="0"
+
+while [ "$C" -lt "$N" ]
+do
+     printf "%s\n"  "$( eval printf '$'ARRAY_$C )"
+     C=$(( C + 1 ))
+done
+
+}
+
+# `bubble sort'
+##############
+
+bubble_sort()
+{
+C="0"
+N="$#" 
+
+for i in $@
+do
+      eval ARRAY_"$C"="$i"
+      C=$(( $C + 1 ))
+done 
+
+C="0"
+
+while [  "$C" -lt "$(( $N - 1 ))"  ]
+do
+     D=0
+     while [ "$D" -lt "$(( $N - $C - 1 ))"  ]
+     do
+          if [  "$( eval printf '$'ARRAY_$D )" -gt \
+                "$( eval printf '$'ARRAY_$(( $D + 1 )) )" ]
+          then
+               HOLD="$( eval printf '$'ARRAY_$D )"
+               eval ARRAY_"$D"="$( eval printf '$'ARRAY_$(( $D + 1 )) )"
+               eval ARRAY_$(( $D + 1 ))="$HOLD"
+          fi
+          D=$(( $D + 1 ))
+     done
+     C=$(( $C + 1 ))
+done
+
+C="0"
+
+while [ "$C" -lt "$N" ]
+do
+     printf "%s\n"  "$( eval printf '$'ARRAY_$C )"
+     C=$(( C + 1 ))
+done
+
+}
+
+# `tokenize'
+##############
+tokenizer()
+{
+     STRNG="${1}"
+     DELIM="${2}"
+
+     while :
+     do
+          NEW="${STRNG%${DELIM}}"
+          while case "$NEW" in
+                     *${DELIM}*);;
+                     *)break;;
+                esac
+          do   NEW="${NEW%${DELIM}*}"
+          done
+          TOKEN="${NEW%${DELIM}*}"
+          STRNG="${STRNG#${TOKEN}${DELIM}}"
+          printf "%s\n" "$TOKEN"
+          
+          case "$STRNG" in
+               *${DELIM}*) ;;
+               *) [ -n "$d" ] && break || d="1" ;;
+          esac
+     done
+}
+
+# `count'
+##############
+
+cnt(){ 
+     printf "${#1}" 
+}
+
+# `linegrop'
+##############
+linegrop()
+{ 
+    p=$1
+    shift
+    [ -f "$1" ] && i="$@" || i="/dev/stdin"
+    for j in $i
+    do   while read -r i
+         do   case "$i" in
+                  *${p}*) printf '%s\n' "$i" ;; 
+              esac 
+         done < "$j"
+    done
+
+}
+
+
+# `split_phrase'
+##############
+split_phrase(){ 
+     for i in $@
+     do   printf '%s\n' "$i" 
+     done 
+}
+
+
+# `compare'
+############## 
+compare(){
+    case "$2" in
+     *${1}*) printf '%s\n' "$2" ;;
+    esac 
+}
+
+
+# `stdin'
+##############
+stdin(){
+    while read -r i
+    do  printf '%s\n' "$i" 
+    done 
+} 
+
+
+
+
+# `dog' 
+##############
+dog(){
+
+# does not properly reproduce tabs
+
+     [  "$1" ] && i="$@" || i="/dev/stdin"
+     
+     for j in $i
+     do
+          while read -r i
+          do printf '%s\n' "$i"
+          done < "$j"
+     done
+} 
+
+
+
+
